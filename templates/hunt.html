@@ -1,0 +1,462 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="th-container">
+  <div id="th-loader" class="text-center my-5">
+    <div
+      class="spinner-border text-secondary"
+      role="status"
+      style="width: 3rem; height: 3rem"
+    >
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted" style="font-style: italic">
+      Fetching your clue...
+    </p>
+  </div>
+
+  <div id="th-content" style="display: none">
+    <!-- Content will be injected here -->
+  </div>
+</div>
+
+<style>
+  /* --- EXACT ORIGINAL STYLES RESTORED --- */
+  .th-container {
+    max-width: 950px;
+    margin: 20px auto;
+    padding: clamp(20px, 5vw, 40px);
+    background: #1a1a1a;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    min-height: 400px;
+  }
+  .light-mode .th-container {
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .th-clue-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  @media (max-width: 576px) {
+    .th-container {
+      margin: 10px auto;
+      padding: 20px 15px;
+      border-radius: 10px;
+    }
+    .clue-box {
+      padding: 20px 15px !important;
+    }
+    #revealed-clues {
+      padding: 30px 15px !important;
+    }
+    .section-title h2 {
+      font-size: 2rem !important;
+      letter-spacing: 3px !important;
+    }
+    .th-clue-text {
+      font-size: 1.05rem;
+    }
+  }
+
+  /* Wordle Styles */
+  .wordle-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    width: fit-content;
+    margin: 0 auto;
+    max-width: 100%;
+    perspective: 1000px;
+  }
+  .wordle-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .wordle-tile {
+    width: clamp(35px, 12vw, 62px);
+    height: clamp(35px, 12vw, 62px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.1rem, 6vw, 2rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    user-select: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+    transform-style: preserve-3d;
+    color: #fff;
+  }
+  .light-mode .wordle-tile {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    color: #333;
+  }
+
+  .wordle-tile.flip {
+    animation: flipTile 0.6s ease-in-out forwards;
+  }
+
+  @keyframes flipTile {
+    0% { transform: rotateX(0deg); }
+    50% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
+  }
+
+  .wordle-tile.correct {
+    background: linear-gradient(145deg, #6aaa64, #538d4e) !important;
+    border-color: #538d4e !important;
+    color: white !important;
+    box-shadow:
+      0 4px 0 #3e6a3a,
+      0 10px 20px rgba(106, 170, 100, 0.3) !important;
+  }
+  .wordle-tile.present {
+    background: linear-gradient(145deg, #c9b458, #b59f3b) !important;
+    border-color: #b59f3b !important;
+    color: white !important;
+    box-shadow:
+      0 4px 0 #8d7d2e,
+      0 10px 20px rgba(201, 180, 88, 0.3) !important;
+  }
+  .wordle-tile.absent {
+    background: #787c7e !important;
+    border-color: #616466 !important;
+    color: white !important;
+    box-shadow: 0 4px 0 #4a4d4e !important;
+    opacity: 0.8;
+  }
+
+  /* Next Destination Revealed Section */
+  #revealed-clues {
+    background: rgba(128, 128, 128, 0.03);
+    border-radius: 20px;
+    padding: 50px 40px;
+    margin-top: 60px;
+    border: 1px solid rgba(128, 128, 128, 0.08);
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.02);
+  }
+
+  .clue-box {
+    position: relative;
+    background: #252525;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    padding: 30px;
+    margin-bottom: 20px;
+  }
+  .light-mode .clue-box {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  }
+
+  .clue-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+  }
+  .light-mode .clue-box:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  }
+
+  .clue-header-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    color: #bbb;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .light-mode .clue-header-badge {
+    background: rgba(0, 0, 0, 0.04);
+    color: #555;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .wordle-keyboard {
+    max-width: 500px;
+    margin: 30px auto 0;
+  }
+  .keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    touch-action: manipulation;
+  }
+  .key {
+    background-color: #818384;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: clamp(12px, 4vw, 18px) 0;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    flex: 1;
+    min-width: 25px;
+    font-size: clamp(0.7rem, 3.5vw, 0.9rem);
+    transition: background-color 0.2s;
+  }
+  @media (max-width: 576px) {
+    .keyboard-row {
+      gap: 4px;
+    }
+    .key {
+      border-radius: 3px;
+    }
+  }
+  .light-mode .key {
+    background-color: #d3d6da;
+    color: #333;
+  }
+
+  .fade-in { animation: fadeInReveal 0.8s ease-in forwards; }
+  @keyframes fadeInReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .check-answer-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 40px;
+      border-radius: 50px;
+      font-weight: 800;
+      margin-top: 20px;
+      cursor: pointer;
+  }
+</style>
+
+<script>
+  (function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const clueHash = urlParams.get("clue") || "{{ clue or '' }}";
+
+    async function initTreasureHunt() {
+      if (!clueHash) {
+        showSuccess("YOU ARE ALL SET!", "Go find your first QR code to start the hunt!");
+        return;
+      }
+      try {
+        const response = await fetch(`/api/clue/${clueHash}`);
+        if (!response.ok) {
+            if (response.status === 401) { window.location.href = "/register"; return; }
+            const errData = await response.json();
+            showError("ACCESS DENIED", "Did you try hacking the URL?", "TOO BAD!!!!!", errData.error || "Clue error");
+            return;
+        }
+        const fields = await response.json();
+        renderTreasureClue(fields);
+      } catch (e) {
+        showError("ACCESS DENIED", "Something went wrong...", "TOO BAD!!!!!", e.message);
+      }
+    }
+
+    function formatClueText(text) {
+      if (!text) return "...";
+      let escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return escaped.replace(/&lt;b&gt;/gi, "<b>").replace(/&lt;\/b&gt;/gi, "</b>").replace(/&lt;i&gt;/gi, "<i>").replace(/&lt;\/i&gt;/gi, "</i>");
+    }
+
+    function showSuccess(title, subtitle) {
+      document.getElementById("th-loader").style.display = "none";
+      const contentEl = document.getElementById("th-content");
+      contentEl.innerHTML = `<div class="text-center py-5"><h1 class="font-weight-bold mb-4" style="font-family: 'Playfair Display', serif; color: var(--primary-color); font-size: 3rem;">${title}</h1><p class="lead text-muted">${subtitle}</p><div class="mt-5"><i class="fas fa-map-marked-alt fa-5x mb-4 text-success opacity-50"></i></div></div>`;
+      contentEl.style.display = "block";
+    }
+
+    function showError(header, subheader, footer, reason) {
+      document.getElementById("th-loader").style.display = "none";
+      const contentEl = document.getElementById("th-content");
+      contentEl.innerHTML = `<div class="text-center py-4"><h3 class="font-weight-bold mb-4 text-danger">${header}</h3><div class="mb-4"><img src="https://media.giphy.com/media/Ju7l5y9osyymQ/giphy.gif" alt="Rickroll" style="border-radius: 15px; max-width: 100%; width: 300px;"></div><h4 class="font-weight-bold mb-2">${subheader}</h4><h2 class="font-weight-bold mb-4" style="font-size: 3.5rem;">${footer}</h2><p class="italic text-muted">(${reason})</p></div>`;
+      contentEl.style.display = "block";
+    }
+
+    function renderTreasureClue(f) {
+      document.getElementById("th-loader").style.display = "none";
+      const contentEl = document.getElementById("th-content");
+      const answerLen = f["WORDLE Answer"] ? f["WORDLE Answer"].trim().length : 0;
+
+      // Check if clues actually have content
+      const buildingClue = f["Clue for Location-Building"] && f["Clue for Location-Building"].trim() !== "";
+      const spotClue = f["Clue for the PLACE"] && f["Clue for the PLACE"].trim() !== "";
+
+      contentEl.innerHTML = `
+            <div id="wordle-section">
+                <div class="text-center mb-5">
+                    <h4 class="font-weight-bold mb-2" style="font-family: 'Playfair Display', serif;">The Wordle Challenge</h4>
+                    <p class="text-muted small">
+                        ${f.is_solved ? '<span class="badge badge-success px-3 py-2" style="font-size: 0.9rem;">SOLVED</span>' : `Solve the Wordle given in the previous clue. <b>(${answerLen} letters)</b>`}
+                    </p>
+                </div>
+                <div id="wordle-game-container"></div>
+            </div>
+            
+            <div id="revealed-clues" class="${f.is_solved ? 'fade-in' : ''}" style="display: ${f.is_solved ? 'block' : 'none'};">
+                <div class="section-title text-center mb-5">
+                    <h2 style="font-size: 2.8rem; letter-spacing: 6px; font-family: 'Playfair Display', serif; margin-bottom: 25px;">NEXT DESTINATION</h2>
+                    <div style="width: 60px; height: 3px; background: #6aaa64; margin: 0 auto 25px; border-radius: 2px;"></div>
+                    <p class="text-muted italic" style="font-size: 1.15rem; max-width: 600px; margin: 0 auto;">The path ahead is now clear...</p>
+                </div>
+                
+                <div class="clue-grid">
+                    ${buildingClue ? `
+                    <div class="clue-box building">
+                        <span class="clue-header-badge">The Building</span>
+                        <div class="th-clue-text" style="white-space: pre-wrap; font-weight: 500;">${formatClueText(f["Clue for Location-Building"])}</div>
+                    </div>` : ''}
+
+                    ${spotClue ? `
+                    <div class="clue-box spot">
+                        <span class="clue-header-badge" style="background: rgba(106, 170, 100, 0.1); color: #538d4e; border-color: rgba(106, 170, 100, 0.2);">The Specific Spot</span>
+                        <div class="th-clue-text" style="white-space: pre-wrap; font-weight: 500;">${formatClueText(f["Clue for the PLACE"])}</div>
+                    </div>` : ''}
+
+                    <div class="clue-box wordle-hint">
+                        <span class="clue-header-badge" style="background: rgba(201, 180, 88, 0.1); color: #b59f3b; border-color: rgba(201, 180, 88, 0.2);">Next Wordle Hint</span>
+                        <div class="th-clue-text" style="white-space: pre-wrap; font-weight: 500;">${formatClueText(f["Hint for WORDLE"])}</div>
+                    </div>
+                </div>
+                <div class="text-center mt-5">
+                    <div style="display: inline-block; padding: 15px 30px; border: 1px dashed #555; border-radius: 10px;">
+                        <p class="text-muted small mb-0 font-weight-bold" style="letter-spacing: 2px;">FIND THE NEXT QR CODE TO CONTINUE</p>
+                    </div>
+                </div>
+            </div>
+        `;
+      contentEl.style.display = "block";
+      if (f["WORDLE Answer"]) initWordle(f["WORDLE Answer"], f.is_solved);
+    }
+
+    function initWordle(answer, isSolvedAlready) {
+      const container = document.getElementById("wordle-game-container");
+      const target = answer.trim().toUpperCase();
+      const len = target.length;
+      let currentGuess = "";
+      let guesses = [];
+      let gameOver = isSolvedAlready;
+
+      function createRow(index) {
+        const row = document.createElement("div");
+        row.className = "wordle-row mb-2";
+        for (let i = 0; i < len; i++) {
+          const tile = document.createElement("div");
+          tile.className = "wordle-tile" + (isSolvedAlready ? " correct" : "");
+          tile.textContent = isSolvedAlready ? target[i] : "";
+          tile.id = `tile-${index}-${i}`;
+          row.appendChild(tile);
+        }
+        return row;
+      }
+
+      container.innerHTML = `
+            <div id="wordle-grid-container" class="wordle-grid"></div>
+            ${!isSolvedAlready ? `
+            <div class="wordle-keyboard mt-4">
+                <div class="keyboard-row">${"QWERTYUIOP".split("").map(l => `<button class="key" data-key="${l}">${l}</button>`).join("")}</div>
+                <div class="keyboard-row">${"ASDFGHJKL".split("").map(l => `<button class="key" data-key="${l}">${l}</button>`).join("")}</div>
+                <div class="keyboard-row"><button class="key" style="min-width: 65px;" data-key="ENTER">GO</button>${"ZXCVBNM".split("").map(l => `<button class="key" data-key="${l}">${l}</button>`).join("")}<button class="key" style="min-width: 65px;" data-key="BACKSPACE">⌫</button></div>
+            </div>
+            <div class="text-center mt-4"><button id="wordle-check-btn" class="check-answer-btn">Check Your Answer</button></div>
+            ` : ''}
+            <div id="wordle-message" class="mt-3 font-weight-bold text-center" style="min-height: 24px; font-size: 1.1rem;"></div>
+      `;
+
+      const grid = document.getElementById("wordle-grid-container");
+      grid.appendChild(createRow(0));
+      if (isSolvedAlready) return;
+
+      function handleInput(key) {
+          if (gameOver) return;
+          if (key === "ENTER") submitGuess();
+          else if (key === "BACKSPACE") { currentGuess = currentGuess.slice(0, -1); updateGrid(); }
+          else if (currentGuess.length < len && /^[A-Z]$/.test(key)) { currentGuess += key; updateGrid(); }
+      }
+
+      function updateGrid() {
+        const rowIdx = guesses.length;
+        for (let i = 0; i < len; i++) {
+          const tile = document.getElementById(`tile-${rowIdx}-${i}`);
+          if (tile) tile.textContent = currentGuess[i] || "";
+        }
+      }
+
+      function submitGuess() {
+        if (gameOver) return;
+        if (currentGuess.length !== len) {
+            showMessage(`Answer must be ${len} letters!`, "#dc3545");
+            return;
+        }
+        const rowIdx = guesses.length;
+        const guess = currentGuess.toUpperCase();
+        let results = Array(len).fill("absent");
+        for (let i = 0; i < len; i++) {
+          if (guess[i] === target[i]) results[i] = "correct";
+          else if (target.includes(guess[i])) results[i] = "present";
+        }
+        for (let i = 0; i < len; i++) {
+          const tile = document.getElementById(`tile-${rowIdx}-${i}`);
+          setTimeout(() => {
+            tile.classList.add(results[i], "flip");
+            const keyBtn = document.querySelector(`.key[data-key="${guess[i]}"]`);
+            if (keyBtn) {
+              if (results[i] === "correct") { keyBtn.style.backgroundColor = "#6aaa64"; keyBtn.style.color = "white"; }
+              else if (results[i] === "present" && !keyBtn.classList.contains("correct")) { keyBtn.style.backgroundColor = "#c9b458"; keyBtn.style.color = "white"; }
+              else if (!keyBtn.classList.contains("correct") && !keyBtn.classList.contains("present")) { keyBtn.style.backgroundColor = "#3a3a3c"; keyBtn.style.color = "white"; }
+            }
+          }, i * 150);
+        }
+        guesses.push(guess);
+        currentGuess = "";
+        if (guess === target) {
+          gameOver = true;
+          fetch(`/api/solve/${clueHash}`, { method: "POST" })
+            .then(() => setTimeout(() => {
+                showMessage("That's correct!", "#28a745");
+                const rev = document.getElementById("revealed-clues");
+                rev.style.display = "block";
+                rev.classList.add("fade-in");
+                const kb = document.querySelector(".wordle-keyboard"); if (kb) kb.style.display = "none";
+                const cb = document.getElementById("wordle-check-btn"); if (cb) cb.style.display = "none";
+            }, 1000));
+        } else {
+          setTimeout(() => { showMessage("Keep Trying", "#ffc107"); grid.appendChild(createRow(guesses.length)); }, len * 150 + 100);
+        }
+      }
+
+      function showMessage(msg, color) { const msgEl = document.getElementById("wordle-message"); msgEl.textContent = msg; msgEl.style.color = color; }
+      document.querySelectorAll(".key").forEach(btn => btn.addEventListener("click", () => handleInput(btn.dataset.key)));
+      window.addEventListener("keydown", (e) => { if (!e.ctrlKey && !e.metaKey && !e.altKey) { const key = e.key.toUpperCase(); if (key === "ENTER" || key === "BACKSPACE" || /^[A-Z]$/.test(key)) { e.preventDefault(); handleInput(key); } } });
+      document.getElementById("wordle-check-btn").addEventListener("click", submitGuess);
+    }
+    initTreasureHunt();
+  })();
+</script>
+{% endblock %}

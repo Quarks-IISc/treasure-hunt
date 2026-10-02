@@ -1,0 +1,270 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="text-center py-4 py-md-5">
+    <div class="hero-section mb-5">
+        <h1 class="font-weight-bold mb-3 main-title">THE HUNT IS ON</h1>
+        <div class="title-underline mb-4"></div>
+        <p class="lead text-muted mx-auto hero-subtitle">
+            Welcome to the {{ event_name }}.
+            Choose your path wisely, solve the riddles, and conquer the campus.
+        </p>
+    </div>
+
+    <!-- ACTION AREA -->
+    <div class="row justify-content-center mt-2">
+        {% if team %}
+        <div class="col-12 col-md-8">
+            <div class="status-card p-4">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="pulse-dot mr-2"></div>
+                    <h3 class="mb-0">Team <strong>{{ team.name }}</strong> is Active</h3>
+                </div>
+                <p class="text-muted">You are registered and ready. Find any of the starting QRs to begin your timed journey!</p>
+                <div class="mt-4 d-flex flex-wrap justify-content-center gap-3">
+                    <a href="/leaderboard" class="btn btn-primary px-4 mb-2">Check Progress</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-11 col-md-5 mb-4">
+            <div class="auth-card register h-100">
+                <div class="card-glow"></div>
+                <i class="fas fa-users-cog fa-2x mb-3"></i>
+                <h3>New Hunters</h3>
+                <p>Register your team to start tracking your progress on the leaderboard.</p>
+                <a href="/register" class="btn btn-primary mt-auto">Register Team</a>
+            </div>
+        </div>
+        <div class="col-11 col-md-5 mb-4">
+            <div class="auth-card login h-100">
+                <div class="card-glow"></div>
+                <i class="fas fa-key fa-2x mb-3"></i>
+                <h3>Resume Hunt</h3>
+                <p>Already started? Log in to continue your progress or scan a new clue.</p>
+                <a href="/register" class="btn btn-outline-light mt-auto">Login / Continue</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-5 pt-4">
+        <div class="instruction-badge">
+            <i class="fas fa-qrcode mr-2"></i> SCAN THE FIRST QR TO START TRACKING
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <!-- STARTING TRACKS UI -->
+    <div class="starting-paths-container mb-5">
+        <div class="row justify-content-center">
+            {% set icons = ["fa-compass", "fa-map-signs", "fa-route"] %}
+            {% for track, hint in start_hints %}
+            <div class="col-12 col-md-4 mb-4">
+                <div class="path-card track-{{ (loop.index0 % 3) + 1 }}">
+                    <div class="path-icon-circle">
+                        <i class="fas {{ icons[loop.index0 % 3] }}"></i>
+                    </div>
+                    <div class="path-header">
+                        <h3>Track 1.{{ track }}</h3>
+                    </div>
+                    <div class="path-body">
+                        <p class="hint-label">INITIAL WORDLE HINT</p>
+                        <div class="hint-content">
+                            {{ hint or 'Locate QR 1.' ~ track }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .main-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.5rem, 10vw, 4.5rem);
+        letter-spacing: 4px;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .title-underline {
+        width: 100px;
+        height: 4px;
+        background: var(--primary-color);
+        margin: 0 auto;
+        border-radius: 2px;
+    }
+
+    .hero-subtitle {
+        max-width: 700px;
+        font-size: clamp(1rem, 4vw, 1.2rem);
+        opacity: 0.8;
+    }
+
+    .section-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .label-line {
+        height: 1px;
+        background: var(--border-color);
+        flex-grow: 1;
+        max-width: 100px;
+    }
+
+    .label-text {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 3px;
+        color: var(--text-muted);
+    }
+
+    /* Path Cards UI */
+    .path-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 30px 20px;
+        position: relative;
+        height: 100%;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .path-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        border-color: var(--primary-color);
+    }
+
+    .path-icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 1.5rem;
+        color: var(--text-muted);
+        transition: all 0.3s;
+    }
+
+    .path-tag {
+        font-size: 0.65rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        background: rgba(255,255,255,0.05);
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .path-card h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+
+    .hint-label {
+        font-size: 0.6rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .hint-content {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-style: italic;
+        padding: 15px;
+        background: rgba(0,0,0,0.2);
+        border-radius: 12px;
+    }
+
+    .path-footer {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .status-text {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        letter-spacing: 1px;
+    }
+
+    /* Track Specific Colors */
+    .track-1:hover .path-icon-circle { color: #6aaa64; background: rgba(106, 170, 100, 0.1); }
+    .track-2:hover .path-icon-circle { color: #4dabf7; background: rgba(77, 171, 247, 0.1); }
+    .track-3:hover .path-icon-circle { color: #ff922b; background: rgba(255, 146, 43, 0.1); }
+
+    /* Auth Cards */
+    .auth-card, .status-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 35px 25px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.3s;
+    }
+
+    .status-card {
+        background: rgba(106, 170, 100, 0.03);
+        border-color: rgba(106, 170, 100, 0.2);
+    }
+
+    .pulse-dot {
+        width: 10px;
+        height: 10px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        box-shadow: 0 0 0 rgba(106, 170, 100, 0.4);
+        animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+        0% { box-shadow: 0 0 0 0 rgba(106, 170, 100, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(106, 170, 100, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(106, 170, 100, 0); }
+    }
+
+    .instruction-badge {
+        display: inline-block;
+        padding: 12px 30px;
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed var(--border-color);
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 576px) {
+        .path-card { padding: 25px 15px; }
+        .hint-content { font-size: 0.85rem; min-height: 60px; }
+        .path-header h3 { font-size: 1.3rem; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,15 @@
+[project]
+name = "treasure-hunt"
+version = "0.1.0"
+description = "QR-code + Wordle treasure hunt server"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "python-dotenv",
+    "requests",
+    "jinja2",
+    "python-multipart",
+    "qrcode[pil]",
+]

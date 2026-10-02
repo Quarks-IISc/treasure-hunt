@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 p-4">
+            <h2 class="text-center mb-4" style="font-family: 'Playfair Display', serif;">Join the Hunt</h2>
+            
+            {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <form action="/register" method="post">
+                <input type="hidden" name="clue" value="{{ clue or '' }}">
+                <div class="form-group">
+                    <label for="name">Team Name</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter team name" required>
+                    <small class="text-muted">If your team already exists, use the same password to log in.</small>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Set a password" required>
+                    <small class="text-danger font-weight-bold">YOU WONT be able to change your password, keep it simple to remember.</small>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block py-2 mt-4" style="background-color: var(--primary-color); border: none;">Start Hunting</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+[
+    {
+        "id": "example-1-1",
+        "clue_hash": "a1b2c3d4e5f6",
+        "clue_order": "1.1",
+        "actual_building": "Main Building",
+        "actual_spot": "Notice board near the entrance",
+        "building_clue": "",
+        "place_clue": "",
+        "wordle_hint": "Hint shown on the home page for the start of track 1.",
+        "wordle_answer": "START"
+    },
+    {
+        "id": "example-2-1",
+        "clue_hash": "b2c3d4e5f6a1",
+        "clue_order": "2.1",
+        "actual_building": "Library",
+        "actual_spot": "Second floor, reading room",
+        "building_clue": "Riddle pointing to the building of this clue (shown after solving 1.1).",
+        "place_clue": "Riddle pointing to the exact spot inside the building.",
+        "wordle_hint": "Hint for this clue's Wordle.",
+        "wordle_answer": "BOOKS"
+    },
+    {
+        "id": "example-1-2",
+        "clue_hash": "c3d4e5f6a1b2",
+        "clue_order": "1.2",
+        "actual_building": "Canteen",
+        "actual_spot": "Behind the counter",
+        "building_clue": "",
+        "place_clue": "",
+        "wordle_hint": "Hint shown on the home page for the start of track 2.",
+        "wordle_answer": "LUNCH"
+    },
+    {
+        "id": "example-2-2",
+        "clue_hash": "d4e5f6a1b2c3",
+        "clue_order": "2.2",
+        "actual_building": "Lab Complex",
+        "actual_spot": "Ground floor corridor",
+        "building_clue": "Riddle pointing to the building of this clue (shown after solving 1.2).",
+        "place_clue": "Riddle pointing to the exact spot inside the building.",
+        "wordle_hint": "Hint for this clue's Wordle.",
+        "wordle_answer": "LASER"
+    }
+]

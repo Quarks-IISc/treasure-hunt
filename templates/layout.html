@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title | default(event_name) }}</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #6aaa64;
+        --secondary-color: #c9b458;
+        --dark-bg: #121212;
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0a0a0;
+        --border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      body {
+        font-family: "Montserrat", sans-serif;
+        background-color: var(--dark-bg);
+        color: var(--text-main);
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+        min-height: 100vh;
+      }
+
+      /* Dark Mode is DEFAULT now */
+      .light-mode {
+        --dark-bg: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-main: #333333;
+        --text-muted: #666666;
+        --border-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar {
+        background-color: var(--card-bg);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .navbar-brand {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        color: var(--text-main) !important;
+        letter-spacing: 1px;
+      }
+
+      .card,
+      .clue-box,
+      .th-container {
+        background-color: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 15px !important;
+        transition:
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.3s ease !important;
+        color: var(--text-main) !important;
+      }
+
+      /* Hover Lift Effect */
+      .card:hover,
+      .clue-box:hover,
+      .hover-lift:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+      }
+
+      .light-mode .card:hover,
+      .light-mode .clue-box:hover {
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      main.container {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+
+      @media (max-width: 576px) {
+        .navbar-brand {
+          font-size: 1.2rem;
+        }
+        .container {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        main.container {
+          padding-top: 2rem !important;
+          padding-bottom: 2rem !important;
+        }
+      }
+
+      footer {
+        padding: 60px 0;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .mode-toggle {
+        cursor: pointer;
+        padding: 10px;
+        font-size: 1.2rem;
+        color: var(--text-main);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        font-weight: 700;
+        border-radius: 50px;
+        padding: 10px 25px;
+        transition: all 0.3s;
+      }
+      .btn-primary:hover {
+        background-color: #5a9154;
+        transform: scale(1.05);
+      }
+
+      .text-muted {
+        color: var(--text-muted) !important;
+      }
+
+      /* Custom scrollbar for dark mode */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #444;
+      }
+    </style>
+    {% block head %}{% endblock %}
+  </head>
+  <body class="">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <a class="navbar-brand" href="/">TREASURE HUNT</a>
+        <div class="ml-auto d-flex align-items-center">
+          <a
+            href="/leaderboard"
+            class="mr-4 font-weight-bold"
+            style="color: var(--text-main); text-decoration: none"
+            >Leaderboard</a
+          >
+          {% if team %}
+          <span class="mr-3 d-none d-sm-inline"
+            >Team:
+            <strong style="color: var(--primary-color)"
+              >{{ team.name }}</strong
+            ></span
+          >
+          <a href="/logout" class="btn btn-sm btn-outline-danger mr-3"
+            >Logout</a
+          >
+          {% endif %}
+          <div class="mode-toggle" onclick="toggleMode()">
+            <i class="fas fa-sun" id="mode-icon"></i>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-5">{% block content %}{% endblock %}</main>
+
+    <footer>
+      <div class="container">
+        <p>&copy; {{ event_name }} - <i>DON'T BOTHER HACKING</i></p>
+      </div>
+    </footer>
+
+    <script>
+      function toggleMode() {
+        document.body.classList.toggle("light-mode");
+        const icon = document.getElementById("mode-icon");
+        if (document.body.classList.contains("light-mode")) {
+          icon.classList.remove("fa-sun");
+          icon.classList.add("fa-moon");
+          localStorage.setItem("theme", "light");
+        } else {
+          icon.classList.remove("fa-moon");
+          icon.classList.add("fa-sun");
+          localStorage.setItem("theme", "dark");
+        }
+      }
+
+      // Apply saved theme (Default is DARK)
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "light") {
+          document.body.classList.add("light-mode");
+          document
+            .getElementById("mode-icon")
+            .classList.replace("fa-sun", "fa-moon");
+        }
+      });
+    </script>
+  </body>
+</html>

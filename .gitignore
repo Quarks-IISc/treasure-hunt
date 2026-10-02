@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets
+.env
+
+# Per-event data (never commit answers or team passwords)
+clues.json
+teams.json
+answers.txt
+clue_links.txt
+qrcodes/
+qrcodes_package/
+treasure_hunt_package.zip
